@@ -14,24 +14,6 @@ import java.util.Scanner;
 // in my pattern, each publisher should send message to a specific event service . They could coordinated by using zookeeper, and send the
 //    result to subscriber via the one which has been named as the "main event service"
 public class pub {
-
-    /*
-    public static void main (String[] args) throws Exception {
-        // Prepare our context and publisher
-        Context context = ZMQ.context(1);
-        Socket publisher = context.socket(ZMQ.PUB);
-
-        publisher.bind("tcp://*:5563");
-        while (!Thread.currentThread ().isInterrupted ()) {
-            // Write two messages, each with an envelope and content
-            publisher.sendMore ("A");
-            publisher.send ("We don't want to see this");
-            publisher.sendMore ("B");
-            publisher.send("We would like to see this");
-        }
-        publisher.close ();
-        context.term ();
-    }*/
     public static void main(String args[]){
         Scanner mScanner = new Scanner(System.in);
         System.out.println("Please input the port number you want");
