@@ -33,9 +33,6 @@ public class sub {
             mSub.recvMessage();
         });
 
-        Thread recHistory = new Thread(() -> {
-            mSub.recvHistory();
-        });
 
         Thread showMessage = new Thread(() -> {
             mSub.showCur();
@@ -46,7 +43,6 @@ public class sub {
         });
 
         recMessage.start();
-        recHistory.start();
         showMessage.start();
         showHistory.start();
     }

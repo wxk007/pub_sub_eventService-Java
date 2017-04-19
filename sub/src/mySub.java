@@ -17,8 +17,8 @@ public class mySub {
     private String port;
 
     //this context is used to receive history message
-    private Context hisContext;
-    private Socket hisSocket;
+    //  private Context hisContext;
+    // private Socket hisSocket;
 
     //describe the topic we sbuscribed
     private String topic;
@@ -40,8 +40,8 @@ public class mySub {
         curContext = ZMQ.context(1);
         curSocket = curContext.socket(ZMQ.SUB);
 
-        hisContext = ZMQ.context(1);
-        hisSocket = hisContext.socket(ZMQ.SUB);
+        //hisContext = ZMQ.context(1);
+        // hisSocket = hisContext.socket(ZMQ.SUB);
 
         this.curLock = new ReentrantLock();
         this.curCond = curLock.newCondition();
@@ -52,31 +52,68 @@ public class mySub {
         this.hisMessage = new LinkedList<>();
 
         curSocket.connect("tcp://localhost:" + this.port);
-        hisSocket.connect("tcp://localhost:" + this.port);
+        // hisSocket.connect("tcp://localhost:" + this.port);
     }
 
+    //we could use threads to add or remove the current item inside the buffer, which is way more faster
     public void recvMessage(){
         curSocket.subscribe(this.topic.getBytes());
         while (!Thread.currentThread ().isInterrupted ()){
             String curTopic = curSocket.recvStr();
             String curContent = curSocket.recvStr();
-            message tempMessage = new message(curTopic, curContent);
-            curLock.lock();
-            while(curMessage.size() > 0){
-                try {
-                    curCond.await();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            curContent = curContent.replaceAll(" ","");
+            String[] isHistory = curContent.split(",");
+            message tempHis, tempMessage;
+            //if the receiving message is a history, add it into the history buffer
+            if (isHistory.length >= 2){
+                tempHis = new message(curTopic, isHistory[0]);
+                addToHisBuffer(tempHis);
             }
-            curMessage.add(tempMessage);
-            if(curMessage.size() != 0){
-                curCond.signal();
+            //else, add it to current buffer
+            else{
+                tempMessage = new message(curTopic, curContent);
+                addToCurBuffer(tempMessage);
             }
-            curLock.unlock();
         }
     }
 
+    //I would test it latter
+    private void addToHisBuffer(message tempHis){
+        hisLock.lock();
+        while(hisMessage.size() >= 5){
+            try {
+                hisCond.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        hisMessage.add(tempHis);
+        //we should signal the waiting thread if we've got enough history record
+        if(hisMessage.size() >= 5)
+            hisCond.signal();
+        hisLock.unlock();
+
+    }
+
+    private void addToCurBuffer(message tempMessage){
+        curLock.lock();
+        while(curMessage.size() > 0){
+            try {
+                curCond.await();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        curMessage.add(tempMessage);
+        if(curMessage.size() != 0){
+            curCond.signal();
+        }
+        curLock.unlock();
+
+    }
+
+    /*
+    //this should be deleted latter
     public void recvHistory(){
         String hisTopic = "history";
         hisSocket.subscribe(hisTopic.getBytes());
@@ -99,7 +136,7 @@ public class mySub {
             hisLock.unlock();
 
         }
-    }
+    }*/
 
     //this method is used to display current message
     public void showCur(){
