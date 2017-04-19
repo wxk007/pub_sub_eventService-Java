@@ -26,13 +26,13 @@ public class main {
                 System.out.println("Please input an integer");
             }
         }
-        System.out.println("Please input the topic");
-        String topic = mScanner.next();
+        //System.out.println("Please input the topic");
+        //String topic = mScanner.next();
 
-        eventService mES = new eventService(recPort, sendPort,topic);
+        eventService mES = new eventService(recPort, sendPort);
 
         Thread recCurThread = new Thread(()->{
-           mES.receive();
+            mES.receive();
         });
 
         Thread sendCurThread = new Thread(() ->{
