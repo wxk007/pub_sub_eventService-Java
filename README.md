@@ -7,3 +7,9 @@ You can run this sample code in any network environment you want. You should inp
 Do javac pub.java & javac eventService.java & javac sub.java to compile, then do java pub & java eventService & java sub to run the sample
 
 History function has been implemented, strength function has not been implemented
+
+To run this sample, you could put the zmq.jar in a directory and cd into the pub or sub or es src dir, do:
+javac -cp PATH/zmq.jar *.java
+then:
+java -cp PATH/zmq.jar: main(or sub, pub)
+where PATH is the path you store the zmq.jar file.
