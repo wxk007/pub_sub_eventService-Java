@@ -10,6 +10,8 @@ History function has been implemented, strength function has not been implemente
 
 To run this sample, you could put the zmq.jar in a directory and cd into the pub or sub or es src dir, do:
 javac -cp PATH/zmq.jar *.java
+
 then:
+
 java -cp PATH/zmq.jar: main(or sub, pub)
 where PATH is the path you store the zmq.jar file.
